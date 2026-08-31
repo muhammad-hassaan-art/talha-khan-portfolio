@@ -53,3 +53,7 @@ marquee and category-filtered projects. All motion is disabled under
 ## License
 
 All rights reserved.
+
+---
+
+Live at **https://talha-khan-portfolio-gamma.vercel.app**
