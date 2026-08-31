@@ -1,0 +1,440 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Palette — dark green theme from the reference design.
+   Every effect below is driven by these variables, so changing
+   --primary re-themes the whole site. Never hardcode a hex.
+   ============================================================ */
+
+:root {
+  --background: oklch(0.16 0.018 155);        /* near-black green */
+  --foreground: oklch(0.97 0.005 150);        /* off-white text */
+  --card: oklch(0.21 0.024 155);              /* raised panel */
+  --card-foreground: oklch(0.97 0.005 150);
+  --popover: oklch(0.21 0.024 155);
+  --popover-foreground: oklch(0.97 0.005 150);
+  --primary: oklch(0.78 0.24 140);            /* signature lime green */
+  --primary-foreground: oklch(0.16 0.03 150); /* dark text on green */
+  --secondary: oklch(0.26 0.028 155);
+  --secondary-foreground: oklch(0.97 0.005 150);
+  --muted: oklch(0.24 0.024 155);
+  --muted-foreground: oklch(0.70 0.018 150);
+  --accent: oklch(0.78 0.24 140);
+  --accent-foreground: oklch(0.16 0.03 150);
+  --border: oklch(0.30 0.032 152);
+  --input: oklch(0.22 0.026 155);
+  --ring: oklch(0.78 0.24 140 / 0.55);
+  --chart-2: oklch(0.72 0.17 165);            /* teal-green companion */
+  --radius: 0.9rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-2: var(--chart-2);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-outfit), sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+  }
+
+  /* Entrance animations translate content in from off-axis; without this the
+     transient overhang widens the document and scrolls the page sideways. */
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+/* Custom scrollbar, tinted to the accent. */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* ============================================================
+   Interaction & motion layer.
+   NOTE: intentionally OUTSIDE @layer — Tailwind v4 tree-shakes
+   layered rules whose classes it cannot statically see, and
+   several of these are applied dynamically via cn().
+   ============================================================ */
+
+/* --- Ambient aurora background ---------------------------- */
+.aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(100px);
+  opacity: 0.16;
+  will-change: transform;
+}
+
+.aurora-blob-1 {
+  width: 46vw;
+  height: 46vw;
+  top: -14%;
+  left: -10%;
+  background: radial-gradient(circle, var(--primary), transparent 70%);
+  animation: aurora-drift-1 22s ease-in-out infinite;
+}
+
+.aurora-blob-2 {
+  width: 40vw;
+  height: 40vw;
+  bottom: -16%;
+  right: -10%;
+  background: radial-gradient(circle, var(--chart-2), transparent 70%);
+  animation: aurora-drift-2 28s ease-in-out infinite;
+}
+
+@keyframes aurora-drift-1 {
+  0%,
+  100% {
+    transform: translate(0) scale(1);
+  }
+  50% {
+    transform: translate(8vw, 6vh) scale(1.12);
+  }
+}
+
+@keyframes aurora-drift-2 {
+  0%,
+  100% {
+    transform: translate(0) scale(1);
+  }
+  50% {
+    transform: translate(-6vw, -5vh) scale(1.16);
+  }
+}
+
+/* --- Subtle dot grid overlay ------------------------------ */
+.dot-grid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in oklch, var(--primary) 22%, transparent) 1px,
+    transparent 0
+  );
+  background-size: 34px 34px;
+}
+
+/* --- Scroll reveal ---------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-left {
+  transform: translateX(-34px);
+}
+
+.reveal-right {
+  transform: translateX(34px);
+}
+
+.reveal-scale {
+  transform: scale(0.94);
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --- Card lift on hover ----------------------------------- */
+.card-lift {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-8px);
+  border-color: color-mix(in oklch, var(--primary) 55%, transparent);
+  box-shadow: 0 22px 40px -18px color-mix(in oklch, var(--primary) 45%, transparent),
+    0 10px 20px -12px rgb(0 0 0 / 0.5);
+}
+
+/* --- Animated gradient border on hover -------------------- */
+.gradient-border {
+  position: relative;
+  z-index: 0;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(120deg, var(--primary), var(--chart-2), var(--primary));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+/* --- Shine sweep ------------------------------------------ */
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent 0, rgb(255 255 255 / 0.14) 50%, transparent);
+  transform: rotate(30deg);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.5s;
+}
+
+.shine:hover::after {
+  opacity: 1;
+  transform: rotate(30deg) translate(100%, -100%);
+  transition: transform 0.75s, opacity 0.5s;
+}
+
+/* --- Glow pulse on the primary CTA ------------------------ */
+.glow-pulse {
+  animation: glow-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 28px 4px color-mix(in oklch, var(--primary) 30%, transparent);
+  }
+}
+
+/* --- Gradient text ---------------------------------------- */
+.gradient-text {
+  background-image: linear-gradient(110deg, var(--primary), var(--chart-2), var(--primary));
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradient-pan 6s linear infinite;
+}
+
+@keyframes gradient-pan {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* --- Underline grow (nav links) --------------------------- */
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(to right, var(--primary), var(--chart-2));
+  transition: width 0.3s ease;
+}
+
+.link-underline:hover::after,
+.link-underline[data-active="true"]::after {
+  width: 100%;
+}
+
+/* --- Infinite marquee ------------------------------------- */
+.marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: 2rem;
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+}
+
+.marquee-track {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  min-width: 100%;
+  animation: marquee-scroll 32s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - 2rem));
+  }
+}
+
+/* --- Floating bob ----------------------------------------- */
+.animate-float {
+  animation: float-soft 6s ease-in-out infinite;
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* --- Typing caret ----------------------------------------- */
+.type-caret::after {
+  content: "|";
+  color: var(--primary);
+  animation: caret-blink 1s step-end infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* --- Scroll-down mouse indicator -------------------------- */
+.scroll-dot {
+  animation: scroll-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes scroll-dot {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+
+/* --- Skill bar fill --------------------------------------- */
+.bar-fill {
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .aurora-blob,
+  .animate-float,
+  .glow-pulse,
+  .gradient-text,
+  .marquee-track,
+  .scroll-dot,
+  .type-caret::after {
+    animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .card-lift:hover {
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
